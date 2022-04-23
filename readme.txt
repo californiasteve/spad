@@ -1,7 +1,7 @@
 === Fetch SPAD ===
 
 Contributors: pjaudiomv
-Tags: spad, just for today, narcotics anonymous, na
+Tags: spad, spiritual principle a day, narcotics anonymous, na
 Tested up to: 5.8.2
 Stable tag: 1.6.6
 License: GPLv2 or later
