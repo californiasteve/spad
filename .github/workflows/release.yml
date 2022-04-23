@@ -31,7 +31,7 @@ jobs:
       - name: Prepare artifact metadata
         id: prepare_artifact_metadata
         run: |
-          echo ::set-output name=ARTIFACT_PATH::./fetch-spad-build-${GITHUB_REF##*/}.zip
+          echo ::set-output name=ARTIFACT_PATH::dist/github/fetch-spad-build-${GITHUB_REF##*/}.zip
           echo ::set-output name=ARTIFACT_NAME::fetch-spad-build-${GITHUB_REF##*/}.zip
       - name: Release beta
         if: contains(github.ref, 'beta')
