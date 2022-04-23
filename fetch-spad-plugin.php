@@ -21,14 +21,14 @@ function spad_options_menu()
 }
 
 // add settings link to plugins page
-function plugin_add_settings_link($links)
+function spad_add_settings_link($links)
 {
     $settings_link = '<a href="options-general.php?page=spad-plugin">' . __('Settings') . '</a>';
     array_unshift($links, $settings_link);
     return $links;
 }
 $plugin = plugin_basename(__FILE__);
-add_filter("plugin_action_links_$plugin", 'plugin_add_settings_link');
+add_filter("plugin_action_links_$plugin", 'spad_add_settings_link');
 add_action( 'wp_enqueue_scripts', 'spad_assets' );
 
 function spad_assets() {
