@@ -43,6 +43,10 @@
     margin-bottom: 1em;
 }
 
+#spad-divider {
+    visibility: hidden !important;
+}
+
 #spad-container {
     width: 770px;
     margin:0 auto;

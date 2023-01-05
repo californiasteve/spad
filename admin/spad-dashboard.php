@@ -5,8 +5,7 @@
 function spad_plugin_settings()
 {
     //register our settings
-    register_setting('spad-plugin-settings-group', 'spad_timezone');
-    register_setting('spad-plugin-settings-group', 'custom_css_spad');
+    register_setting('spad-plugin-settings-group', 'spad_layout');
 }
 
 add_action('admin_init', 'spad_plugin_settings');
@@ -23,27 +22,17 @@ function fetch_spad_plugin_page()
             ?>
             <table class="form-table">
                 <tr valign="top">
-                    <th scope="row">Timezone</th>
+                    <th scope="row">Layout</th>
                     <td>
-                        <select style="display:inline;" id="spad_timezone" name="spad_timezone">
-                            <option value="">Select A Timezone</option>
-                            <?php
-                            $timezones_array = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
-                            foreach ($timezones_array as $tzItem) {
-                                if ($tzItem == get_option('spad_timezone')) { ?>
-                                    <option selected="selected" value="<?php echo $tzItem; ?>"><?php echo $tzItem; ?></option>
-                                <?php } else { ?>
-                                    <option value="<?php echo $tzItem; ?>"><?php echo $tzItem; ?></option>
-                                <?php }
-                            } ?>
+                        <select id="spad_layout" name="spad_layout">
+                            <option value="table" <?php if (esc_attr(get_option('spad_layout'))=='table') {
+                                echo 'selected="selected"';
+                            } ?>>Table (Raw HTML)</option>
+                            <option value="block" <?php if (esc_attr(get_option('spad_layout'))=='block') {
+                                echo 'selected="selected"';
+                            } ?>>Block</option>
                         </select>
-                        <p class="description">Choose the timezone for the SPAD Display. Defaults to America/Los_Angeles.</p>
-                    </td>
-                </tr>
-                <tr valign="top">
-                    <th scope="row">Custom CSS</th>
-                    <td>
-                        <textarea id="custom_css_spad" name="custom_css_spad" cols="100" rows="10"><?php echo get_option('custom_css_spad'); ?></textarea>
+                        <p class="description">Change between raw HTML Table and CSS block elements.</p>
                     </td>
                 </tr>
             </table>

@@ -39,39 +39,98 @@ function spad_func($atts = [])
 {
     $args = shortcode_atts(
         array(
-            'timezone'  =>  '',
+            'layout'    =>  ''
         ),
         $atts
     );
 
-    $spad_timezone = (!empty($args['timezone']) ? sanitize_text_field(strtolower($args['timezone'])) : get_option('spad_timezone'));
-    $spad_base_url = "https://spiritualprinciplea.day";
+    $spad_layout = (!empty($args['layout']) ? sanitize_text_field(strtolower($args['layout'])) : get_option('spad_layout'));
+    $spad_url = 'https://spadna.org';
+    $spad_dom_element = 'table';
 
-    if (isset($spad_timezone) && !empty($spad_timezone)) {
-        $spad_url = "$spad_base_url/?tz=$spad_timezone";
+    // Get the contents of SPAD
+    if ($spad_layout == 'block') {
+        libxml_use_internal_errors(true);
+        $url = utf8_encode(wp_remote_fopen($spad_url));
+        $d = new DOMDocument();
+        $d->validateOnParse = true;
+        $d->loadHTML($url);
+        libxml_clear_errors();
+        libxml_use_internal_errors(false);
+   
+        $spad_ids = array('spad-date','spad-title','spad-page','spad-quote','spad-quote-source','spad-content','spad-divider','spad-thought','spad-copyright');
+        $spad_class = 'spad-rendered-element';
+        $i = 0;
+        $k = 1;
+        $content = '<div id="spad-container" class="'.$spad_class.'">';
+
+        foreach ($d->getElementsByTagName('tr') as $element) {
+            if ($i != 5) {
+                $formated_element = trim($element->nodeValue);
+                $content .= '<div id="'.$spad_ids[$i].'" class="'.$spad_class.'">'.$formated_element.'</div>';
+            } else {
+                $dom = new DOMDocument();
+                libxml_use_internal_errors(true);
+                $dom->loadHTML(utf8_encode(wp_remote_fopen($spad_url)));
+                libxml_clear_errors();
+                libxml_use_internal_errors(false);
+                $values = array();
+                $xpath = new DOMXPath($dom);
+                foreach ($xpath->query('//tr') as $row) {
+                    $row_values = array();
+                    foreach ($xpath->query('td', $row) as $cell) {
+                        $innerHTML= '';
+                        $children = $cell->childNodes;
+                        foreach ($children as $child) {
+                            $innerHTML .= $child->ownerDocument->saveXML($child);
+                        }
+                        $row_values[] = $innerHTML;
+                    }
+                    $values[] = $row_values;
+                }
+                $break_array = preg_split('/<br[^>]*>/i', (join('', $values[5])));
+                $content .= '<div id="'.$spad_ids[$i].'" class="'.$spad_class.'">';
+                foreach ($break_array as $p) {
+                    if (!empty($p)) {
+                        $formated_element = '<p id="'.$spad_ids[$i].'-'.$k.'" class="'.$spad_class.'">'.trim($p).'</p>';
+                        $content .= preg_replace("/<p[^>]*>([\s]|&nbsp;)*<\/p>/", '', $formated_element);
+                        $k++;
+                    }
+                }
+                $content .= '</div>';
+            }
+            $i++;
+        }
+        $content .= '</div>';
     } else {
-        $spad_url = "$spad_base_url/";
+        $spad_get = wp_remote_get($spad_url);
+        $spad_content_header = wp_remote_retrieve_header($spad_get, 'content-type');
+        $spad_body = wp_remote_retrieve_body($spad_get);
+
+        if (preg_match('/\s*charset=(.*)?/im', $spad_content_header, $matches)) {
+            if (isset($matches[1])) {
+                $char_encoding = strtoupper(trim($matches[1]));
+            } else {
+                $char_encoding = "UTF-8";
+            }
+        } else {
+            $char_encoding = "UTF-8";
+        }
+
+        $content = '';
+        $d1 = new DOMDocument;
+        $spad = new DOMDocument;
+        libxml_use_internal_errors(true);
+        $d1->loadHTML(mb_convert_encoding($spad_body, 'HTML-ENTITIES', $char_encoding));
+        libxml_clear_errors();
+        libxml_use_internal_errors(false);
+        $xpath = new DOMXpath($d1);
+        $body = $xpath->query("//$spad_dom_element");
+        foreach ($body as $child) {
+            $spad->appendChild($spad->importNode($child, true));
+        }
+        $content .= $spad->saveHTML();
     }
-
-    $spad_get = wp_remote_get($spad_url);
-    $spad_content_header = wp_remote_retrieve_header($spad_get, 'content-type');
-    $spad_body = wp_remote_retrieve_body($spad_get);
-
-    $content = '';
-    $d1 = new DOMDocument;
-    $spad = new DOMDocument;
-    libxml_use_internal_errors(true);
-    $d1->loadHTML(mb_convert_encoding($spad_body, 'HTML-ENTITIES', "UTF-8"));
-    libxml_clear_errors();
-    libxml_use_internal_errors(false);
-    $xpath = new DOMXpath($d1);
-    $body = $xpath->query("//*[@id='spad-container']");
-    foreach ($body as $child) {
-        $spad->appendChild($spad->importNode($child, true));
-    }
-    $content .= $spad->saveHTML();
-
-    $content .= "<style type='text/css'>" . get_option('custom_css_spad') . "</style>";
     return $content;
 }
 
