@@ -1,6 +1,6 @@
 === Fetch SPAD ===
 
-Contributors: pjaudiomv
+Contributors: pjaudiomv,
 Tags: spad, spiritual principle a day, narcotics anonymous, na
 Tested up to: 6.1.1
 Stable tag: 1.0.0
@@ -13,7 +13,11 @@ Fetch SPAD is a plugin that pulls the Spiritual Principle A Day and puts it on y
 
 SHORTCODE
 Basic: [spad]
-Timezone: Allows you to set a specific timezone to get the reading.
+Layout: Table, Block [jft layout=""]
+
+EXAMPLES
+
+<a href="https://www.mvana.org/a-spiritual-principle-a-day/">https://www.mvana.org/a-spiritual-principle-a-day/</a>
 
 MORE INFORMATION
 
