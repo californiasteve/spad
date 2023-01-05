@@ -48,14 +48,16 @@ function spad_func($atts = [])
     $spad_layout = (!empty($args['layout']) ? sanitize_text_field(strtolower($args['layout'])) : get_option('spad_layout'));
     $spad_url = 'https://spadna.org';
     $spad_dom_element = 'table';
+    $char_encoding = "UTF-8";
 
     // Get the contents of SPAD
     if ($spad_layout == 'block') {
         libxml_use_internal_errors(true);
-        $url = utf8_encode(wp_remote_fopen($spad_url));
+        $spad_data = mb_convert_encoding(wp_remote_fopen($spad_url), 'HTML-ENTITIES', $char_encoding);
+        $spad_data = str_replace('--', '&mdash;', $spad_data);
         $d = new DOMDocument();
         $d->validateOnParse = true;
-        $d->loadHTML($url);
+        $d->loadHTML($spad_data);
         libxml_clear_errors();
         libxml_use_internal_errors(false);
    
@@ -70,13 +72,7 @@ function spad_func($atts = [])
                 $formated_element = trim($element->nodeValue);
                 $content .= '<div id="'.$spad_ids[$i].'" class="'.$spad_class.'">'.$formated_element.'</div>';
             } else {
-                $dom = new DOMDocument();
-                libxml_use_internal_errors(true);
-                $dom->loadHTML(utf8_encode(wp_remote_fopen($spad_url)));
-                libxml_clear_errors();
-                libxml_use_internal_errors(false);
-                $values = array();
-                $xpath = new DOMXPath($dom);
+                $xpath = new DOMXPath($d);
                 foreach ($xpath->query('//tr') as $row) {
                     $row_values = array();
                     foreach ($xpath->query('td', $row) as $cell) {
@@ -105,19 +101,8 @@ function spad_func($atts = [])
         $content .= '</div>';
     } else {
         $spad_get = wp_remote_get($spad_url);
-        $spad_content_header = wp_remote_retrieve_header($spad_get, 'content-type');
         $spad_body = wp_remote_retrieve_body($spad_get);
-
-        if (preg_match('/\s*charset=(.*)?/im', $spad_content_header, $matches)) {
-            if (isset($matches[1])) {
-                $char_encoding = strtoupper(trim($matches[1]));
-            } else {
-                $char_encoding = "UTF-8";
-            }
-        } else {
-            $char_encoding = "UTF-8";
-        }
-
+        $spad_body = str_replace('--', '&mdash;', $spad_body);
         $content = '';
         $d1 = new DOMDocument;
         $spad = new DOMDocument;
