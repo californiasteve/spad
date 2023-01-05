@@ -6,3 +6,4 @@ composer.lock export-ignore
 Dockerfile export-ignore
 docker-compose.yml export-ignore
 /.github export-ignore
+/assets export-ignore
