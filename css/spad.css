@@ -1,13 +1,13 @@
 #spad-date {
     text-align: center;
-    font-size: x-large;
+    font-size: inherit;
     margin-top: 1em;
 }
 
 #spad-title {
     text-align: center;
     font-weight: bold;
-    font-size: xx-large;
+    font-size: inherit;
     margin-bottom: .5em;
 }
 
@@ -19,7 +19,7 @@
 #spad-quote {
     text-align: left;
     font-style: italic;
-    font-size: large;
+    font-size: inherit;
     margin-bottom: 1em;
 }
 
@@ -39,7 +39,7 @@
 #spad-copyright {
     font-style: italic;
     text-align: center;
-    font-size: small;
+    font-size: inherit;
     margin-bottom: 1em;
 }
 
@@ -48,8 +48,8 @@
 }
 
 #spad-container {
-    width: 770px;
+    width: 100%;
     margin:0 auto;
-    font-size: medium;
-    font-family: 'times new roman', serif;
+    font-size: inherit;
+    font-family: default;
 }
